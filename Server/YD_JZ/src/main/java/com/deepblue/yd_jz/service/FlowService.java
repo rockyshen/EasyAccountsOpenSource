@@ -9,8 +9,10 @@ import com.deepblue.yd_jz.entity.Action;
 import com.deepblue.yd_jz.entity.Flow;
 import com.deepblue.yd_jz.dao.mybatis.FlowDao;
 import com.deepblue.yd_jz.entity.Type;
+import com.deepblue.yd_jz.exception.BusinessException;
 import com.deepblue.yd_jz.utils.ContentValues;
 import com.deepblue.yd_jz.utils.LogUtils;
+import com.deepblue.yd_jz.utils.StatusCodeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,13 +67,17 @@ public class FlowService {
                 break;
             case ContentValues.ACTION_SUB:
                 if (accountMoney.compareTo(flowMoney) < 0) {
-                    throw new Exception("减少金额不允许大于账户金额");
+                    // 改为抛出自定义业务异常
+//                    throw new Exception("减少金额不允许大于账户金额");
+                    throw new BusinessException(StatusCodeEnum.FLOW_ERROR);
                 }
                 account = handleAccount(ContentValues.ACTION_SUB, flowAddRequestDto.getMoney(), account, action.isExempt());
                 break;
             case ContentValues.ACTION_INNER:
                 if (accountMoney.compareTo(flowMoney) < 0) {
-                    throw new Exception("减少金额不允许大于账户金额");
+                    // 改为抛出自定义业务异常
+//                    throw new Exception("减少金额不允许大于账户金额");
+                    throw new BusinessException(StatusCodeEnum.FLOW_ERROR);
                 }
                 toAccount = accountService.getOriginAccountById(flowAddRequestDto.getAccountToId());
                 toAccount = handleAccount(ContentValues.ACTION_ADD, flowAddRequestDto.getMoney(), toAccount, action.isExempt());
