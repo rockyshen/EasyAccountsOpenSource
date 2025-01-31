@@ -30,7 +30,11 @@ public class HomeController {
     @ApiOperation(value = "获取首页信息")
     @GetMapping("/getHomeInfo")
     public BaseDto<HomeDto> getHomeInfo() {
+        // TODO 增加判断空，返回详细错误信息，而不是/500
+        // homeService会抛自定义BusinessException，如何接住？
         HomeDto homeDto = homeService.getHomeBean();
+
+
         BaseDto baseDto = new BaseDto();
         baseDto.setData(homeDto);
         return baseDto;

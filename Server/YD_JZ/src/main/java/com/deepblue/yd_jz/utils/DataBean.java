@@ -1,5 +1,6 @@
 package com.deepblue.yd_jz.utils;
 
+// 统一返回类！
 public class DataBean<T> {
     private int code;
     private String msg;

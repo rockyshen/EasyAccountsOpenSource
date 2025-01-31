@@ -6,7 +6,6 @@ import java.util.List;
 
 @Data
 public class HomeDto {
-
     private String totalAsset;
     private String netAsset;
     private String curIncome;
@@ -19,7 +18,6 @@ public class HomeDto {
     private String yearBalance;
     private List<HomeAccountBean> accounts;
 
-
     @Data
     public static class HomeAccountBean {
         private int id;
@@ -28,6 +26,5 @@ public class HomeDto {
         private String exemptAsset;
         private String percent;
         private String note;
-
     }
 }

@@ -15,6 +15,7 @@ public class AccountResponseDto {
     private String createTime;
     private String note;
 
+    // 将Account实体类转为AccountResponseDto，脱敏！
     public AccountResponseDto convertToDto(Account account) {
         if (account == null) {
             return this;

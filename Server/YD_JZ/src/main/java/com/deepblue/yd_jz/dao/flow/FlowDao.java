@@ -1,6 +1,6 @@
 package com.deepblue.yd_jz.dao.flow;
 
-import com.deepblue.yd_jz.controller.flow.FlowBaseBean;
+//import com.deepblue.yd_jz.controller.flow.FlowBaseBean;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
