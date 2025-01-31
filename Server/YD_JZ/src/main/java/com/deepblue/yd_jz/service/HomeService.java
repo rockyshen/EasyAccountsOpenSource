@@ -5,6 +5,8 @@ import com.deepblue.yd_jz.entity.Account;
 import com.deepblue.yd_jz.dao.jpa.AccountRepository;
 import com.deepblue.yd_jz.dao.mybatis.FlowDao;
 import com.deepblue.yd_jz.entity.FlowYear;
+import com.deepblue.yd_jz.exception.BusinessException;
+import com.deepblue.yd_jz.utils.StatusCodeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,7 +67,13 @@ public class HomeService {
         homeDto.setAccounts(homeAccounts);
         int currentYear = Year.now().getValue();
 
+        // 初始化时，flowYear是null！需要增加判空
         FlowYear flowYear = flowDao.getYearlySummary(currentYear);
+        if(flowYear == null){
+            // 抛异常出去
+            throw new BusinessException(StatusCodeEnum.NULL_ERROR);
+        }
+
         BigDecimal totalEarns = new BigDecimal(flowYear.getTotalEarns());
         BigDecimal totalCosts = new BigDecimal(flowYear.getTotalCosts());
         BigDecimal totalBalance = new BigDecimal(flowYear.getTotalBalance());
