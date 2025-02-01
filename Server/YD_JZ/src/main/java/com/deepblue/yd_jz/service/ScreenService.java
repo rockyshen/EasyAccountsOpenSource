@@ -9,6 +9,7 @@ import com.deepblue.yd_jz.dto.FlowListDto;
 import com.deepblue.yd_jz.dto.ScreenFlowRequestDto;
 import com.deepblue.yd_jz.data.ScreenExcelData;
 import com.deepblue.yd_jz.dao.mybatis.FlowDao;
+import com.deepblue.yd_jz.exception.BusinessException;
 import com.deepblue.yd_jz.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -175,8 +176,10 @@ public class ScreenService {
     @Transactional(rollbackFor = Exception.class)
     public void makeScreenExcel(ScreenFlowRequestDto screenFlowRequestDto, String excelName) throws Exception {
         FlowListDto flowListDto = getFlowByScreen(screenFlowRequestDto);
-        if (flowListDto.getFlows().size() == 0) {
-            throw new Exception("所选size 为0");
+        if (flowListDto.getFlows().size() == 0) {   // 导出excel时，如果没有流水信息，会报这个错误
+            // 修改为自定义业务异常
+            //throw new Exception("所选size 为0");
+            throw new BusinessException(StatusCodeEnum.SELECTED_FLOW_EMPTY);
         }
         ScreenExcelData excelBean = new ScreenExcelData();
         excelBean.setFlow(new ArrayList<>());
@@ -192,6 +195,7 @@ public class ScreenService {
         });
         excelBean.setTotalIn(flowListDto.getTotalIn());
         excelBean.setTotalOut(flowListDto.getTotalOut());
+        excelBean.setTotalEarn(flowListDto.getTotalEarn());
         excelBean.setDate(screenFlowRequestDto.getStartDate() + " 至 " + screenFlowRequestDto.getEndDate());
         excelBean.setName(excelName);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
@@ -209,6 +213,7 @@ public class ScreenService {
         }
     }
 
+    // 具体执行导出excel文件的地方
     private String doMakeExcel(ScreenExcelData excelBean, String excelName) {
         String excelPath = excelFolder + excelName;
         ExcelWriter excelWriter = EasyExcel.write().file(excelPath)
@@ -216,9 +221,16 @@ public class ScreenService {
                 .registerWriteHandler(new ExcelService.ExcelWriteHandler())
                 .build();
         WriteSheet writeSheet = EasyExcel.writerSheet().build();
-        excelWriter.fill(excelBean, writeSheet);
-        excelWriter.fill(new FillWrapper("flow", excelBean.getFlow()), writeSheet);
-        excelWriter.finish();
+        // 修复Excel导出时报错的自定义业务异常提示
+        try {
+            // 将整个excelBean对象填充到Excel模板中
+            excelWriter.fill(excelBean, writeSheet);
+            // 填充模版Excel中的“flow”列，内容是excelBean的flow属性
+            excelWriter.fill(new FillWrapper("flow", excelBean.getFlow()), writeSheet);
+            excelWriter.finish();
+        } catch (Exception e) {
+            throw new BusinessException(StatusCodeEnum.EXCEL_WRITE_ERROR);
+        }
         return excelPath;
     }
 
