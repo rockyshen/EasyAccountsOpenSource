@@ -1,4 +1,4 @@
-package com.deepblue.yd_jz.service;
+package com.deepblue.yd_jz.service.impl;
 
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.exception.InputRequiredException;
@@ -6,7 +6,8 @@ import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.exception.UploadFileException;
 import com.deepblue.yd_jz.dto.FlowAddRequestDto;
 import com.deepblue.yd_jz.exception.BusinessException;
-import com.deepblue.yd_jz.utils.QwenUtils;
+import com.deepblue.yd_jz.service.AiAnalysisService;
+import com.deepblue.yd_jz.utils.QwenBean;
 import com.deepblue.yd_jz.utils.StatusCodeEnum;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -27,14 +28,14 @@ import java.util.regex.Pattern;
 @Service
 public class AiAnalysisServiceImpl implements AiAnalysisService {
     @Autowired
-    private QwenUtils qwenUtils;
+    private QwenBean qwenBean;
 
     // controller接受图片，调用阿里通义大模型，分析账单，封装成flowAddRequest实体类
     @Override
     public List<FlowAddRequestDto> analyzeFlowByAi(String filePath) throws NoApiKeyException, UploadFileException, InputRequiredException {
         String flowInfo = null;
-        flowInfo = qwenUtils.ocrConversationCall(filePath);
-        GenerationResult result = qwenUtils.callWithMessage(flowInfo);
+        flowInfo = qwenBean.ocrConversationCall(filePath);
+        GenerationResult result = qwenBean.callWithMessage(flowInfo);
         // 从响应结果中，解析处JSON，然后解析成FlowAddRequestDto对象
         String content = result.getOutput().getChoices().get(0).getMessage().getContent();
         // 根据Ai答复结果，提取JSON

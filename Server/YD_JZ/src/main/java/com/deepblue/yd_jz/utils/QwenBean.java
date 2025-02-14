@@ -28,8 +28,14 @@ import java.util.Map;
  * 调用 阿里通义千问 API
  */
 
-@Service
-public class QwenUtils {
+
+public class QwenBean {
+    private String apiKey;
+
+    public QwenBean(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
     public String ocrConversationCall(String filePath)
             throws ApiException, NoApiKeyException, UploadFileException {
         MultiModalConversation conv = new MultiModalConversation();
@@ -46,7 +52,7 @@ public class QwenUtils {
         MultiModalConversationParam param = MultiModalConversationParam.builder()
                 // 若没有配置环境变量，请用百炼API Key将下行替换为：.apiKey("sk-xxx")
 //                .apiKey(System.getenv("DASHSCOPE_API_KEY"))
-                .apiKey("sk-17c736f433a3486f964efb7318bd43c3")
+                .apiKey(apiKey)
                 .model("qwen-vl-ocr")
                 .message(userMessage)
                 .build();
@@ -92,7 +98,7 @@ public class QwenUtils {
                             "money": "消费金额",
                             "fDate": "账单日期",
                             "createDate": "默认为空，不用生成",
-                            "actionId": "根据我提供的action和id的对应关系进行判断，输入Int类型，而不是String类型",
+                            "actionId": "根据我提供的action和id的对应关系进行判断，输入Int类型，而不是String类型，如果不确定就选支出",
                             "accountId": "默认为47",
                             "accountToId": "识别不到，可以为空",
                             "typeId": "根据我提供的类别和id的对应关系进行判断，输入Int类型，而不是String类型",
@@ -111,7 +117,7 @@ public class QwenUtils {
         GenerationParam param = GenerationParam.builder()
                 // 若没有配置环境变量，请用百炼API Key将下行替换为：.apiKey("sk-xxx")
 //                .apiKey(System.getenv("DASHSCOPE_API_KEY"))
-                .apiKey("sk-17c736f433a3486f964efb7318bd43c3")
+                .apiKey(apiKey)
                 // 模型列表：https://help.aliyun.com/zh/model-studio/getting-started/models
                 .model("qwen-plus")
                 .messages(Arrays.asList(systemMsg, userMsg))
