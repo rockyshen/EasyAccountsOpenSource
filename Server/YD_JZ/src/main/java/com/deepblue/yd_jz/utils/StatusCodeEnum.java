@@ -26,7 +26,8 @@ public enum StatusCodeEnum {
     SYSTEM_ERROR(500,"系统内部异常",""),
     FLOW_ERROR(502,"减少金额不允许大于账户金额",""),
     SELECTED_FLOW_EMPTY(503,"所选时间范围无流水信息",""),
-    EXCEL_WRITE_ERROR(504,"Excel导出失败","")
+    EXCEL_WRITE_ERROR(504,"Excel导出失败",""),
+    QWEN_API_ERROR(505,"通义千问调用异常","请参考文档：https://help.aliyun.com/zh/model-studio/developer-reference/error-code");
     ;
 
     // 第一步：定义枚举属性

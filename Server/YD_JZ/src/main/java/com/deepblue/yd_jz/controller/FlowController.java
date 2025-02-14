@@ -1,17 +1,34 @@
 package com.deepblue.yd_jz.controller;
 
+import com.alibaba.dashscope.aigc.generation.GenerationResult;
+import com.alibaba.dashscope.exception.ApiException;
+import com.alibaba.dashscope.exception.InputRequiredException;
+import com.alibaba.dashscope.exception.NoApiKeyException;
+import com.alibaba.dashscope.exception.UploadFileException;
 import com.deepblue.yd_jz.dto.FlowAddRequestDto;
 import com.deepblue.yd_jz.dto.FlowListDto;
 import com.deepblue.yd_jz.dto.FlowSingleResponseDto;
+import com.deepblue.yd_jz.exception.BusinessException;
+import com.deepblue.yd_jz.service.AiAnalysisService;
 import com.deepblue.yd_jz.service.ExcelService;
 import com.deepblue.yd_jz.service.FlowService;
 import com.deepblue.yd_jz.dto.BaseDto;
 import com.deepblue.yd_jz.data.MonthExcelData;
+import com.deepblue.yd_jz.utils.LogUtils;
+import com.deepblue.yd_jz.utils.StatusCodeEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 @RestController
 @RequestMapping("/flow")
@@ -23,6 +40,9 @@ public class FlowController {
 
     @Autowired
     ExcelService excelService;
+
+    @Autowired
+    AiAnalysisService aiAnalyzeService;
 
     @ApiOperation(value = "添加流水")
     @PostMapping("/addFlow")
@@ -84,6 +104,45 @@ public class FlowController {
         MonthExcelData monthExcelData =excelService.makeMonthExcel(date);
         BaseDto baseDto = BaseDto.setSuccessBean();
         baseDto.setData(monthExcelData);
+        return baseDto;
+    }
+
+    @ApiOperation(value = "Ai分析截图账单")
+    @PostMapping("/analyzeFlowByAi")
+    public BaseDto analyzeFlowByAi(@RequestParam("file") MultipartFile file){
+        // 从网页获取到图片文件后，存入当前工程的 /static/pic
+        String currentDir = System.getProperty("user.dir");
+        Path path = Paths.get(currentDir, "YD_JZ/src/main/resources/static/pic");
+        try {
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
+            String filePath = path.toString() + "/" + file.getOriginalFilename();
+            File destFile = new File(filePath);
+            file.transferTo(destFile);
+
+//            LogUtils.log_print("File saved successfully: " + destFile.getAbsolutePath());
+
+            // 调用AI服务
+            List<FlowAddRequestDto> flowAddRequestDtoList = aiAnalyzeService.analyzeFlowByAi(filePath);
+
+            // 获取到一组Gson解析好的对象，挨个调用addFlow服务
+            for (FlowAddRequestDto flowAddRequestDto : flowAddRequestDtoList) {
+                System.out.println("开始添加每一条流水");
+                System.out.println(flowAddRequestDto);
+
+                flowService.doAddFlow(flowAddRequestDto);
+
+                System.out.println("本条流水添加成功！！");
+            }
+
+        } catch (IOException | NoApiKeyException | UploadFileException | InputRequiredException e) {
+            new BusinessException(StatusCodeEnum.QWEN_API_ERROR);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        BaseDto baseDto = BaseDto.setSuccessBean();
         return baseDto;
     }
 }
