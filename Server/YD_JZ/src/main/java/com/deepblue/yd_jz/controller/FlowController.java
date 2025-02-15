@@ -28,7 +28,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/flow")
@@ -117,7 +121,25 @@ public class FlowController {
             if (!Files.exists(path)) {
                 Files.createDirectories(path);
             }
-            String filePath = path.toString() + "/" + file.getOriginalFilename();
+            // 下面这段逻辑是：图片重命名，避免文件冲突！ TODO 可以提取成一个单独的方法！
+            // 获取当前日期并格式化为 "yyyyMMdd"
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            String date = sdf.format(new Date());
+            // 生成 6 位随机数
+            Random random = new Random();
+            int randomNumber = 100000 + random.nextInt(900000);
+            String originalFilename = file.getOriginalFilename();
+            // 获取原始文件名和其扩展名
+            String extension = "";
+            int dotIndex = originalFilename.lastIndexOf('.');
+            if (dotIndex > 0 && dotIndex < originalFilename.length() - 1) {
+                extension = originalFilename.substring(dotIndex);
+            }
+            // 去掉原始文件名中的扩展名部分
+            String baseName = originalFilename.substring(0, dotIndex);
+            // 为避免文件重名，按：IMG_20250215_784609.jpg 格式存储
+            String newFilename = baseName + "_" + date + "_" + randomNumber + extension;
+            String filePath = path + "/" + newFilename;
             File destFile = new File(filePath);
             file.transferTo(destFile);
 
@@ -130,9 +152,7 @@ public class FlowController {
             for (FlowAddRequestDto flowAddRequestDto : flowAddRequestDtoList) {
                 System.out.println("开始添加每一条流水");
                 System.out.println(flowAddRequestDto);
-
                 flowService.doAddFlow(flowAddRequestDto);
-
                 System.out.println("本条流水添加成功！！");
             }
 
