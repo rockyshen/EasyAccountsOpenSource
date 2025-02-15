@@ -2,7 +2,7 @@ package com.deepblue.yd_jz.service;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
-import com.alibaba.excel.metadata.CellData;
+//import com.alibaba.excel.metadata.CellData;
 import com.alibaba.excel.metadata.Head;
 import com.alibaba.excel.write.handler.CellWriteHandler;
 import com.alibaba.excel.write.metadata.WriteSheet;
@@ -171,24 +171,24 @@ public class ExcelService {
 
         }
 
-        @Override
-        public void afterCellDataConverted(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, CellData cellData, Cell cell, Head head, Integer integer, Boolean aBoolean) {
+//        @Override
+//        public void afterCellDataConverted(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, CellData cellData, Cell cell, Head head, Integer integer, Boolean aBoolean) {
+//
+//        }
 
-        }
-
-        @Override
-        public void afterCellDispose(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List<CellData> list, Cell cell, Head head, Integer integer, Boolean aBoolean) {
-            CellStyle cellStyle = cell.getCellStyle();
-            cellStyle.setBorderBottom(BorderStyle.THIN);
-            cellStyle.setBorderLeft(BorderStyle.THIN);
-            cellStyle.setBorderRight(BorderStyle.THIN);
-            cellStyle.setBorderTop(BorderStyle.THIN);
-            cellStyle.setBottomBorderColor((short) 0);
-            cellStyle.setTopBorderColor((short) 0);
-            cellStyle.setLeftBorderColor((short) 0);
-            cellStyle.setRightBorderColor((short) 0);
-            cell.setCellStyle(cellStyle);
-        }
+//        @Override
+//        public void afterCellDispose(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List<CellData> list, Cell cell, Head head, Integer integer, Boolean aBoolean) {
+//            CellStyle cellStyle = cell.getCellStyle();
+//            cellStyle.setBorderBottom(BorderStyle.THIN);
+//            cellStyle.setBorderLeft(BorderStyle.THIN);
+//            cellStyle.setBorderRight(BorderStyle.THIN);
+//            cellStyle.setBorderTop(BorderStyle.THIN);
+//            cellStyle.setBottomBorderColor((short) 0);
+//            cellStyle.setTopBorderColor((short) 0);
+//            cellStyle.setLeftBorderColor((short) 0);
+//            cellStyle.setRightBorderColor((short) 0);
+//            cell.setCellStyle(cellStyle);
+//        }
     }
 
 

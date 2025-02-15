@@ -118,7 +118,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>easyexcel</artifactId>
-            <version>2.2.4</version>
+            <version>3.3.4</version>
         </dependency>
 
         <!-- 添加Swagger 2核心依赖 -->
@@ -168,6 +168,7 @@
             <artifactId>dashscope-sdk-java</artifactId>
             <version>2.18.2</version>
         </dependency>
+
 
     </dependencies>
 
