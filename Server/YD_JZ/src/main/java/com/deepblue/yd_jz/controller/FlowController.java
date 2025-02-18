@@ -122,8 +122,8 @@ public class FlowController {
                 Files.createDirectories(path);
             }
             // 下面这段逻辑是：图片重命名，避免文件冲突！ TODO 可以提取成一个单独的方法！
-            // 获取当前日期并格式化为 "yyyyMMdd"
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            // 获取当前日期并格式化为 "202502182310"
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
             String date = sdf.format(new Date());
             // 生成 6 位随机数
             Random random = new Random();
