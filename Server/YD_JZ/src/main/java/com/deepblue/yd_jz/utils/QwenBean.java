@@ -99,36 +99,58 @@ public class QwenBean {
         // TODO type与id的映射，action与id的映射，由外部查询后传入，而不是硬编码！
         // 今天的日期：系统获取后传入
         String prompt =
-            """
-            以上是提供给你文字版的账单内容，请你分析账单内容，每一条消费记录，请你封装进如下 JSON 格式中，如果有多条就整合成一个列表输出你的回复
-            {
-                "money": "消费金额",
-                "fDate": "账单日期",
-                "createDate": "默认为空，不用生成",
-                "actionId": "根据我提供的action和id的对应关系进行判断，输入Int类型，而不是String类型，如果不确定就选支出",
-                "accountId": "默认为
-            """ + defaultAccountId
-            +
-            """
-                "accountToId": "默认为0",
-                "typeId": "根据我下文提供的类别和id的对应关系进行判断，输入Int类型，而不是String类型",
-                "isCollect": "这是Boolean类型，统一给默认值为false",
-                "note": "消费记录的详情"
-            }"""
-            +
-            """
-            以下是一些补充信息：
-            1、如果图片识别出来和账单无关，note写入“未识别到账单信息！”，其余JSON字段全部设置为空的，千万不要生成虚假数据！
-            2、当账单金额为减号加一个数字（例如：“-298.00”），表示行为是“支出”，记录在money字段时，去掉负号，只保留金额（例如："298.00"）
-            3、注意每个字段的类型，应该为Int或Boolean类型的，我已经在示例中声明了；
-            """
-            +
-            "4、fDate为账单日期，我告诉你今天是"+formattedDate+"，例如文本中的“今天14:00”，请按照“yyyy-MM-dd”的格式生成，忽略时间；"
-            +
-            " 5、action行为与actionId的对应关系是："+actionMapString
-            +
-            "6、type类别与typeId的对应关系是，"+typeMapString
-            +"你识别不了的消费记录，可以归到“其他”类别下。";
+                "以上是提供给你文字版的账单内容，请你分析账单内容，每一条消费记录，请你封装进如下 JSON 格式中，如果有多条就整合成一个列表输出你的回复\n" +
+                    "{\n" +
+                    "    \"money\": \"消费金额\",\n" +
+                    "    \"fDate\": \"账单日期\",\n" +
+                    "    \"createDate\": \"默认为空，不用生成\",\n" +
+                    "    \"actionId\": \"根据我提供的action和id的对应关系进行判断，输入Int类型，而不是String类型，如果不确定就选支出\",\n" +
+                    "    \"accountId\": \"默认为" + defaultAccountId + "\",\n" +
+                    "    \"accountToId\": \"默认为0\",\n" +
+                    "    \"typeId\": \"根据我下文提供的类别和id的对应关系进行判断，输入Int类型，而不是String类型\",\n" +
+                    "    \"isCollect\": \"这是Boolean类型，统一给默认值为false\",\n" +
+                    "    \"note\": \"消费记录的详情\"\n" +
+                    "}\n" +
+                    "以下是一些补充信息：\n" +
+                    "1、如果图片识别出来和账单无关，note写入“未识别到账单信息！”，其余JSON字段全部设置为空的，千万不要生成虚假数据！\n" +
+                    "2、当账单金额为减号加一个数字（例如：“-298.00”），表示行为是“支出”，记录在money字段时，去掉负号，只保留金额（例如：“298.00”）\n" +
+                    "3、注意每个字段的类型，应该为Int或Boolean类型的，我已经在示例中声明了；\n" +
+                    "4、fDate为账单日期，我告诉你今天是" + formattedDate + "，例如文本中的“今天14:00”，请按照“yyyy-MM-dd”的格式生成，忽略时间；\n" +
+                    "5、action行为与actionId的对应关系是：" + actionMapString + "\n" +
+                    "6、type类别与typeId的对应关系是，" + typeMapString + "\n你识别不了的消费记录，可以归到“其他”类别下。";
+
+        // JDK 11不支持长文本，废弃初版
+//        String prompt =
+//            """
+//            以上是提供给你文字版的账单内容，请你分析账单内容，每一条消费记录，请你封装进如下 JSON 格式中，如果有多条就整合成一个列表输出你的回复
+//            {
+//                "money": "消费金额",
+//                "fDate": "账单日期",
+//                "createDate": "默认为空，不用生成",
+//                "actionId": "根据我提供的action和id的对应关系进行判断，输入Int类型，而不是String类型，如果不确定就选支出",
+//                "accountId": "默认为
+//            """ + defaultAccountId
+//            +
+//            """
+//                "accountToId": "默认为0",
+//                "typeId": "根据我下文提供的类别和id的对应关系进行判断，输入Int类型，而不是String类型",
+//                "isCollect": "这是Boolean类型，统一给默认值为false",
+//                "note": "消费记录的详情"
+//            }"""
+//            +
+//            """
+//            以下是一些补充信息：
+//            1、如果图片识别出来和账单无关，note写入“未识别到账单信息！”，其余JSON字段全部设置为空的，千万不要生成虚假数据！
+//            2、当账单金额为减号加一个数字（例如：“-298.00”），表示行为是“支出”，记录在money字段时，去掉负号，只保留金额（例如："298.00"）
+//            3、注意每个字段的类型，应该为Int或Boolean类型的，我已经在示例中声明了；
+//            """
+//            +
+//            "4、fDate为账单日期，我告诉你今天是"+formattedDate+"，例如文本中的“今天14:00”，请按照“yyyy-MM-dd”的格式生成，忽略时间；"
+//            +
+//            " 5、action行为与actionId的对应关系是："+actionMapString
+//            +
+//            "6、type类别与typeId的对应关系是，"+typeMapString
+//            +"你识别不了的消费记录，可以归到“其他”类别下。";
 
         Generation gen = new Generation();
         Message systemMsg = Message.builder()
