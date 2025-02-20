@@ -1,7 +1,6 @@
 package com.deepblue.yd_jz.utils;
 
-import jdk.jfr.StackTrace;
-import okio.Okio;
+//import jdk.jfr.StackTrace;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -14,6 +13,4 @@ public class FileUtils {
         LogUtils.log_print("送检文件："+path+"  是否存在："+isExist);
         return isExist;
     }
-
-
 }

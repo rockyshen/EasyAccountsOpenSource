@@ -9,6 +9,7 @@ import com.deepblue.yd_jz.dto.FlowListDto;
 import com.deepblue.yd_jz.dto.ScreenFlowRequestDto;
 import com.deepblue.yd_jz.data.ScreenExcelData;
 import com.deepblue.yd_jz.dao.mybatis.FlowDao;
+import com.deepblue.yd_jz.exception.BusinessException;
 import com.deepblue.yd_jz.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -173,10 +174,12 @@ public class ScreenService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String makeScreenExcel(ScreenFlowRequestDto screenFlowRequestDto, String excelName) throws Exception {
+    public void makeScreenExcel(ScreenFlowRequestDto screenFlowRequestDto, String excelName) throws Exception {
         FlowListDto flowListDto = getFlowByScreen(screenFlowRequestDto);
-        if (flowListDto.getFlows().size() == 0) {
-            return "筛选条件无数据|1";
+        if (flowListDto.getFlows().size() == 0) {   // 导出excel时，如果没有流水信息，会报这个错误
+            // 修改为自定义业务异常
+            //throw new Exception("所选size 为0");
+            throw new BusinessException(StatusCodeEnum.SELECTED_FLOW_EMPTY);
         }
         ScreenExcelData excelBean = new ScreenExcelData();
         excelBean.setFlow(new ArrayList<>());
@@ -192,23 +195,25 @@ public class ScreenService {
         });
         excelBean.setTotalIn(flowListDto.getTotalIn());
         excelBean.setTotalOut(flowListDto.getTotalOut());
+        excelBean.setTotalEarn(flowListDto.getTotalEarn());
         excelBean.setDate(screenFlowRequestDto.getStartDate() + " 至 " + screenFlowRequestDto.getEndDate());
         excelBean.setName(excelName);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String dateStr = sdf.format(new Date());
         excelName = excelName + "_" + dateStr + ".xls";
         String excelPath = doMakeExcel(excelBean, excelName);
-        return uploadExcel(excelPath, excelName + ".xls", excelBean.getName());
+        uploadExcel(excelPath, excelName + ".xls", excelBean.getName());
     }
 
-    private String uploadExcel(String excelPath, String excelFileName, String title) {
+    private void uploadExcel(String excelPath, String excelFileName, String title) {
         if (FileUtils.isExist(excelPath)) {
-            return fileMakeWebHook.sendFile(new File(excelPath), "screen_excel", excelFileName);
-        }else {
-            return "\n文件上传失败\n"+excelPath+excelFileName+"文件不存在|1";
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String dateStr = sdf.format(new Date());
+            fileMakeWebHook.sendFile(new File(excelPath), "screen_excel", excelFileName);
         }
     }
 
+    // 具体执行导出excel文件的地方
     private String doMakeExcel(ScreenExcelData excelBean, String excelName) {
         String excelPath = excelFolder + excelName;
         ExcelWriter excelWriter = EasyExcel.write().file(excelPath)
@@ -216,9 +221,16 @@ public class ScreenService {
                 .registerWriteHandler(new ExcelService.ExcelWriteHandler())
                 .build();
         WriteSheet writeSheet = EasyExcel.writerSheet().build();
-        excelWriter.fill(excelBean, writeSheet);
-        excelWriter.fill(new FillWrapper("flow", excelBean.getFlow()), writeSheet);
-        excelWriter.finish();
+        // 修复Excel导出时报错的自定义业务异常提示
+        try {
+            // 将整个excelBean对象填充到Excel模板中
+            excelWriter.fill(excelBean, writeSheet);
+            // 填充模版Excel中的“flow”列，内容是excelBean的flow属性
+            excelWriter.fill(new FillWrapper("flow", excelBean.getFlow()), writeSheet);
+            excelWriter.finish();
+        } catch (Exception e) {
+            throw new BusinessException(StatusCodeEnum.EXCEL_WRITE_ERROR);
+        }
         return excelPath;
     }
 
