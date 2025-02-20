@@ -24,7 +24,9 @@ public enum StatusCodeEnum {
     NO_AUTH(403,"无权限",""),
     NOT_FOUND(404,"404页面找不到",""),
     SYSTEM_ERROR(500,"系统内部异常",""),
-    FLOW_ERROR(502,"减少金额不允许大于账户金额","")
+    FLOW_ERROR(502,"减少金额不允许大于账户金额",""),
+    SELECTED_FLOW_EMPTY(503,"所选时间范围无流水信息",""),
+    EXCEL_WRITE_ERROR(504,"Excel导出失败","")
     ;
 
     // 第一步：定义枚举属性
