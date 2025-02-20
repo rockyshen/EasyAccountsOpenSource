@@ -8,7 +8,7 @@ from email import encoders
 from fastapi import FastAPI, File, Form, UploadFile
 from pydantic import BaseModel
 
-# 读取环境变量
+# 读取环境变量（环境变量，在docker-compose中设置进去）
 SMTP_SERVER = os.getenv('SMTP_SERVER', '')
 SMTP_PORT = os.getenv('SMTP_PORT', '')
 SMTP_FROM = os.getenv('SMTP_MAIL', '')

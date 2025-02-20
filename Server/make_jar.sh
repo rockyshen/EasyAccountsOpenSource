@@ -1,1 +1,1 @@
-cd YD_JZ && mvn clean install -Pserver && cd .. && docker build -t 775495797/easyaccounts-server:latest . 
+cd YD_JZ && mvn clean install -Pdev && cd .. && docker build --platform linux/amd64 -t rockyshen/easyaccounts-server:1.1 .

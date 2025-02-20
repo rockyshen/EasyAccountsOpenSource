@@ -4,8 +4,8 @@ FROM ubuntu:latest
 # 维护者信息
 LABEL maintainer="Mecy@deep-blue.cloud"
 
-# 暴露端口 8081
-EXPOSE 8081
+# 暴露端口 dev=8085  server=8081
+EXPOSE 8085
 
 # 设置环境变量
 ENV LANGUAGE=C.UTF-8 \

@@ -1,1 +1,1 @@
-docker build -t 775495797/easyaccounts-webhook:latest .
+docker build --platform linux/amd64 -t rockyshen/easyaccounts-webhook:1.1 .
